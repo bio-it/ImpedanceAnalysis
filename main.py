@@ -116,6 +116,7 @@ def pushScopeData(sendData):
 		try:
 			response = requests.post('http://' + server_ip + ':8000/collector/', json.dumps(sendData))
 			response = response.content
+			print response
 			jsonResult = json.loads(response)
 			print('pushScopeData result %s' % (jsonResult['result']))
 			return jsonResult['result']
@@ -141,9 +142,13 @@ class MeasureTimer(threading.Thread):
 	def __init__(self):
 		threading.Thread.__init__(self)
 		self.event = threading.Event()
+		self.startTime = datetime.datetime.now()
 
 	def stop(self):
 		self.event.set()
+
+	def setStartTime(self, currentTime):
+		self.startTime = currentTime
 
 	def run(self):
 		global recordState
@@ -166,6 +171,7 @@ class MeasureTimer(threading.Thread):
 			sendData = { 
 				'dataCounter' : dataCounter,
 				'time' : currentTime.strftime(timeFormat),
+				'timeMin' : ((currentTime - self.startTime).total_seconds() // 60),
 				'Z' : [],
 				'R' : [],
 				'C' : [],
@@ -264,6 +270,7 @@ def monitorCommand():
 						setParameter(Protocol.PARAM_RESULT, 'OK')
 						setParameter(Protocol.PARAM_START_TIME, currentTime.strftime(timeFormat))
 						measureTimer = MeasureTimer()
+						measureTimer.setStartTime(currentTime)
 						measureTimer.start()
 					else:
 						setParameter(Protocol.PARAM_RESULT, 'FAILED')
