@@ -24,7 +24,7 @@ state = Protocol.STATE_INITIALIZNG
 recordState = Protocol.RECORD_STATE_OFF
 deadlineTime = datetime.datetime.now()
 
-server_ip = "210.115.227.99"
+server_ip = "127.0.0.1"
 
 config = {
 	'freq' : [],
@@ -51,7 +51,13 @@ def setParameter(key, value):
 	while(True):
 		try:
 			response = requests.post('http://' + server_ip + ':8000/state/', json.dumps(data))
-			break
+			response = response.content
+			jsonResult = json.loads(response)
+
+			if(jsonResult['result']):
+				break
+			else:
+				time.sleep(0.1)
 		except ConnectionError as e:
 			print "setParameter() not working..retry..(internet connection failed)"
 			time.sleep(5)
@@ -267,35 +273,36 @@ def monitorCommand():
 
 					if(res):
 						state = Protocol.STATE_RUNNING
-						setParameter(Protocol.PARAM_RESULT, 'OK')
 						setParameter(Protocol.PARAM_START_TIME, currentTime.strftime(timeFormat))
+						setParameter(Protocol.PARAM_RESULT, 'OK')
 						measureTimer = MeasureTimer()
 						measureTimer.setStartTime(currentTime)
 						measureTimer.start()
 					else:
-						setParameter(Protocol.PARAM_RESULT, 'FAILED')
 						setParameter(Protocol.PARAM_ERROR, 'Set the result data failed.')
+						setParameter(Protocol.PARAM_RESULT, 'FAILED')
 				else:
 					# setting the error
-					setParameter(Protocol.PARAM_RESULT, 'FAILED');
 					setParameter(Protocol.PARAM_ERROR, 'Not setup')
+					setParameter(Protocol.PARAM_RESULT, 'FAILED');
 			else:
-				setParameter(Protocol.PARAM_RESULT, 'FAILED');
 				setParameter(Protocol.PARAM_ERROR, 'Not setup')
+				setParameter(Protocol.PARAM_RESULT, 'FAILED');
+				
 		elif(configCommand == Protocol.COMMAND_STOP):
 			if(state == Protocol.STATE_RUNNING):
 				measureTimer.stop()
 				setParameter(Protocol.PARAM_RESULT, 'OK');
 			else:
-				setParameter(Protocol.PARAM_RESULT, 'FAILED');
 				setParameter(Protocol.PARAM_ERROR, 'Not running device.')
+				setParameter(Protocol.PARAM_RESULT, 'FAILED');
 		elif(configCommand == Protocol.COMMAND_CHECKCHIP):
 			if((state == Protocol.STATE_READY) or (state == Protocol.STATE_SETUP_OK)):
 				resultValue = dwf.checkChip()
 
 				# saving the valid chip information
-				setParameter(Protocol.PARAM_RESULT, 'OK')
 				setParameter(Protocol.PARAM_CHIPINFO, json.dumps(resultValue))
+				setParameter(Protocol.PARAM_RESULT, 'OK')
 			else:
 				setParameter(Protocol.PARAM_RESULT, 'FAILED')
 
@@ -320,6 +327,7 @@ def monitorCommand():
 				setParameter(Protocol.PARAM_RESULT, 'OK')
 
 			else:
+				setParameter(Protocol.PARAM_ERROR, 'Unknown')
 				setParameter(Protocol.PARAM_RESULT, 'FAILED')
 
 	# update current state into the ini file
