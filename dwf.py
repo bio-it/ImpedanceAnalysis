@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*- 
+# -*- coding: utf-8 -*-
 
 from types import *
 from dwfconstants import *
@@ -33,13 +33,13 @@ def initialize():
 	dwf.FDwfAnalogIOChannelNodeSet(handleDwf, c_int(0), c_int(0), c_double(True))
 
 	# set voltage to 5V
-	dwf.FDwfAnalogIOChannelNodeSet(handleDwf, c_int(0), c_int(1), c_double(5)) 
+	dwf.FDwfAnalogIOChannelNodeSet(handleDwf, c_int(0), c_int(1), c_double(5))
 
 	# enable negative supply
-	dwf.FDwfAnalogIOChannelNodeSet(handleDwf, c_int(1), c_int(0), c_double(True)) 
+	dwf.FDwfAnalogIOChannelNodeSet(handleDwf, c_int(1), c_int(0), c_double(True))
 
 	# set voltage to -5V
-	dwf.FDwfAnalogIOChannelNodeSet(handleDwf, c_int(1), c_int(1), c_double(-5)) 
+	dwf.FDwfAnalogIOChannelNodeSet(handleDwf, c_int(1), c_int(1), c_double(-5))
 
 	# master enable
 	dwf.FDwfAnalogIOEnableSet(handleDwf, c_int(True))
@@ -64,7 +64,7 @@ def initialize():
 	dwf.FDwfAnalogInTriggerConditionSet(handleDwf, trigcondRisingPositive)
 
 	# enable output/mask on 8 LSB IO pins, from DIO 0 to 7
-	dwf.FDwfDigitalIOOutputEnableSet(handleDwf, c_int(0x000F)) 
+	dwf.FDwfDigitalIOOutputEnableSet(handleDwf, c_int(0x000F))
 
 	print("- Setting the channels ended!")
 
@@ -86,7 +86,7 @@ def measureImpedance(channels, freqs):
 	channelCount = len(channels)
 	freqCount = len(freqs)
 
-	print "MeasureImpedance called : channel(%d), freq(%d)" % (channelCount, freqCount)
+	print("MeasureImpedance called : channel(%d), freq(%d)" % (channelCount, freqCount))
 
 	result = [[0]*freqCount for _ in range(channelCount)]
 	for indexChannel in range(channelCount):
@@ -104,7 +104,7 @@ def measureImpedance(channels, freqs):
 			actualFreq = c_double()
 			dwf.FDwfAnalogOutNodeFrequencyGet(handleDwf, c_int(0), AnalogOutNodeCarrier, byref(actualFreq))
 
-			# Sampling frequency calculation, set 2*period less than 
+			# Sampling frequency calculation, set 2*period less than
 			vlen = totalBufferSize + 1
 			tT = bufferSize + 1
 			while vlen > totalBufferSize:
@@ -159,11 +159,11 @@ def checkChip():
 		'valid' : []
 	}
 
-	print "Check chip called()"
+	print("Check chip called()")
 	defaultFreq = 4000
-	channels = range(8) # all channels 
+	channels = range(8) # all channels
 	freqs = [defaultFreq]		# default frequency
-	# getting the impedance with default values 
+	# getting the impedance with default values
 	Z = measureImpedance(channels, freqs)
 
 	for index in range(len(Z)):
@@ -177,5 +177,5 @@ def checkChip():
 		result['Cc'].append(float("{0:.1f}".format(Cc[0])))
 		result['valid'].append(valid)
 
-	print result
+	print(result)
 	return result

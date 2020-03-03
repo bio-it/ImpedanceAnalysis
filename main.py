@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*- 
+# -*- coding: utf-8 -*-
 # Date : 2017.01.02 ~
 # Author : Jun Yeon
 
@@ -13,7 +13,7 @@ import protocol as Protocol
 
 import numpy as np
 
-# for request by http 
+# for request by http
 import requests
 import time
 
@@ -24,7 +24,7 @@ state = Protocol.STATE_INITIALIZNG
 recordState = Protocol.RECORD_STATE_OFF
 deadlineTime = datetime.datetime.now()
 
-server_ip = "127.0.0.1"
+server_ip = "210.115.227.99"
 
 config = {
 	'freq' : [],
@@ -59,7 +59,7 @@ def setParameter(key, value):
 			else:
 				time.sleep(0.1)
 		except ConnectionError as e:
-			print "setParameter() not working..retry..(internet connection failed)"
+			print("setParameter() not working..retry..(internet connection failed)")
 			time.sleep(5)
 
 	# print('setParameter %s(%s) result : %s' % (key, value, response.content))
@@ -81,7 +81,7 @@ def getParameter(key):
 			else:
 				return ''
 		except ConnectionError as e:
-			print "getParameter() not working..retry..(internet connection failed)"
+			print("getParameter() not working..retry..(internet connection failed)")
 			time.sleep(5)
 
 
@@ -111,7 +111,7 @@ def pushResultData(currentTime, timeFormat):
 			print('pushResultData result %s' % (jsonResult['result']))
 			return jsonResult['result']
 		except ConnectionError as e:
-			print "pushResultData() not working..retry..(internet connection failed)"
+			print("pushResultData() not working..retry..(internet connection failed)")
 			time.sleep(5)
 
 
@@ -122,12 +122,12 @@ def pushScopeData(sendData):
 		try:
 			response = requests.post('http://' + server_ip + ':8000/collector/', json.dumps(sendData))
 			response = response.content
-			print response
+			print(response)
 			jsonResult = json.loads(response)
 			print('pushScopeData result %s' % (jsonResult['result']))
 			return jsonResult['result']
 		except ConnectionError as e:
-			print "pushScopeData() not working..retry..(internet connection failed)"
+			print("pushScopeData() not working..retry..(internet connection failed)")
 			time.sleep(5)
 
 
@@ -139,7 +139,7 @@ def initConfiguration():
 			print('initParameter result : %s' % response.content)
 			break
 		except ConnectionError as e:
-			print "initConfiguration() not working..retry..(internet connection failed)"
+			print("initConfiguration() not working..retry..(internet connection failed)")
 			time.sleep(5)
 
 
@@ -174,7 +174,7 @@ class MeasureTimer(threading.Thread):
 			currentTime = datetime.datetime.now()
 			timeFormat = '%Y-%m-%d %H:%M:%S'
 
-			sendData = { 
+			sendData = {
 				'dataCounter' : dataCounter,
 				'time' : currentTime.strftime(timeFormat),
 				'timeMin' : ((currentTime - self.startTime).total_seconds() // 60),
@@ -190,7 +190,7 @@ class MeasureTimer(threading.Thread):
 
 			# separate the datas
 			for channelIdx in range(len(channels)):
-				for freqIdx in range(len(freqs)):	
+				for freqIdx in range(len(freqs)):
 					Zc = resultRawData[channelIdx][freqIdx]
 					Rc, Cc = dwf.ZC2polar(freqs[freqIdx], Zc)
 					Rc = Rc.tolist()
@@ -237,7 +237,7 @@ class MeasureTimer(threading.Thread):
 					print("# measure thread stop set!")
 					break
 
-			if(flag):
+			if flag:
 				break
 
 		print("# measure thread stopped!")
@@ -258,7 +258,7 @@ def monitorCommand():
 	global deadlineTime
 	configCommand = getParameter(Protocol.PARAM_COMMAND)
 	recordState = getParameter(Protocol.PARAM_RECORD_STATE)
-	
+
 	if configCommand:
 		if(configCommand == Protocol.COMMAND_START):
 			if(state == Protocol.STATE_SETUP_OK):
@@ -288,7 +288,7 @@ def monitorCommand():
 			else:
 				setParameter(Protocol.PARAM_ERROR, 'Not setup')
 				setParameter(Protocol.PARAM_RESULT, 'FAILED');
-				
+
 		elif(configCommand == Protocol.COMMAND_STOP):
 			if(state == Protocol.STATE_RUNNING):
 				measureTimer.stop()
@@ -367,7 +367,7 @@ test.start()
 # end of initilizing device
 state = Protocol.STATE_READY
 
-print '### Finishing the initialize..'
+print('### Finishing the initialize..')
 
 while(True):
 	pass
